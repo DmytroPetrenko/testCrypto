@@ -106,6 +106,8 @@ export default {
 				box-sizing: border-box;
 				table-layout: fixed;
 				white-space: nowrap;
+				border: none;
+				border-spacing: 0;
 
 				thead tr td h3 {
 					font-family: "Montserrat";
@@ -124,6 +126,12 @@ export default {
 					text-transform: uppercase;
 					color: #ffffff;
 				}
+
+				tbody tr:hover {
+					background: linear-gradient(90deg, rgba(31, 70, 106, 0.88) 0%, #191a20 138.3%), #191a20;
+					border-radius: 0.5px;
+				}
+
 				tr td:nth-child(2) {
 					text-align: center;
 				}
