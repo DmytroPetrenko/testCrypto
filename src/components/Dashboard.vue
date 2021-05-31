@@ -220,7 +220,6 @@ export default {
 		.tableContainer {
 			flex: 27;
 			background-color: #191a20;
-			padding: 22px 35px;
 
 			.headOfTable h1 {
 				font-family: "Montserrat";
@@ -229,6 +228,7 @@ export default {
 				font-size: 24px;
 				text-transform: uppercase;
 				color: #ffffff;
+				padding: 22px 35px;
 			}
 			.table table {
 				width: 100%;
@@ -246,19 +246,26 @@ export default {
 					line-height: 150%;
 					color: #757679;
 				}
-				tbody tr td h2 {
-					font-family: "Montserrat";
-					font-style: normal;
-					font-weight: 600;
-					font-size: 20px;
-					line-height: 150%;
-					text-transform: uppercase;
-					color: #ffffff;
+				tbody tr {
+					cursor: pointer;
+					td h2 {
+						font-family: "Montserrat";
+						font-style: normal;
+						font-weight: 600;
+						font-size: 20px;
+						line-height: 150%;
+						text-transform: uppercase;
+						color: #ffffff;
+					}
 				}
 
 				.active {
 					background: linear-gradient(90deg, rgba(31, 70, 106, 0.88) 0%, #191a20 138.3%), #191a20;
 					border-radius: 0.5px;
+				}
+
+				tr td:first-child {
+					padding-left: 35px;
 				}
 
 				tr td:nth-child(2) {
@@ -267,6 +274,7 @@ export default {
 
 				tr td:last-child {
 					text-align: right;
+					padding-right: 35px;
 				}
 			}
 		}
