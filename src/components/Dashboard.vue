@@ -298,11 +298,29 @@ export default {
 			.tableContainer {
 				order: 2;
 				flex: 1;
-				padding: 13px 14px 0 15px;
-				.table table thead tr td h3 {
-					margin: 0;
-					font-weight: 400;
-					font-size: 12px;
+				padding-top: 13px;
+				.table table {
+					tr td:first-child {
+						padding-left: 15px;
+					}
+					tr td:last-child {
+						padding-right: 15px;
+					}
+					thead tr td h3 {
+						margin: 0;
+						font-weight: 400;
+						font-size: 12px;
+					}
+					tbody tr td h2 {
+						font-family: "Montserrat";
+						font-style: normal;
+						font-weight: 600;
+						font-size: 20px;
+						line-height: 150%;
+						text-transform: uppercase;
+						color: #ffffff;
+						margin: 0 5px;
+					}
 				}
 			}
 			.graphContainer {
