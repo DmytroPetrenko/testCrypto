@@ -21,31 +21,22 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td><h2></h2></td>
-								<td><h2></h2></td>
-								<td><h2></h2></td>
-							</tr>
-							<tr>
-								<td><h2></h2></td>
-								<td><h2></h2></td>
-								<td><h2></h2></td>
-							</tr>
-							<tr>
-								<td><h2></h2></td>
-								<td><h2></h2></td>
-								<td><h2></h2></td>
-							</tr>
-							<tr>
-								<td><h2></h2></td>
-								<td><h2></h2></td>
-								<td><h2></h2></td>
+							<tr v-for="pair in currencyPairs" :key="pair.id">
+								<td>
+									<h2>{{ pair.value[0] }} | {{ pair.value[1] }}</h2>
+								</td>
+								<td>
+									<h2><img :src="pair.imgSrc" /> {{ pair.changedPercentPerDay }}</h2>
+								</td>
+								<td>
+									<h2>{{ pair.price }}</h2>
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 			</div>
-			<div class="graphContainer">graph</div>
+			<div class="graphContainer">grap</div>
 		</main>
 	</div>
 </template>
@@ -53,7 +44,128 @@
 <script>
 export default {
 	name: "Dashboard",
-	props: {},
+
+	data: function () {
+		return {
+			connection: null,
+			apiKey: "1fc9ac8cdde28a178bef9610e65668c7cb135e4da5ef3326f203b3cfdd963aae",
+			timer: "",
+			currencyPairs: [
+				{
+					id: 0,
+					value: ["USD", "BTC"],
+					price: 0,
+					changedPercentPerDay: 0,
+					imgSrc: require("../assets/imgs/arrow_up.svg"),
+				},
+				{
+					id: 1,
+					value: ["USD", "BCH"],
+					price: 0,
+					changedPercentPerDay: 0,
+					imgSrc: require("../assets/imgs/arrow_up.svg"),
+				},
+				{
+					id: 2,
+					value: ["USD", "ETH"],
+					price: 0,
+					changedPercentPerDay: 0,
+					imgSrc: require("../assets/imgs/arrow_up.svg"),
+				},
+				{
+					id: 3,
+					value: ["USD", "XRP"],
+					price: 0,
+					changedPercentPerDay: 0,
+					imgSrc: require("../assets/imgs/arrow_up.svg"),
+				},
+			],
+		}
+	},
+	methods: {
+		sendMessage: function (subRequest) {
+			let self = this
+			self.connection.send(JSON.stringify(subRequest))
+		},
+		cancelAutoUpdate() {
+			clearInterval(this.timer)
+		},
+		currencyPairsImgChanger: function (pair) {
+			if (pair.changedPercentPerDay > 0) {
+				pair.imgSrc = require("../assets/imgs/arrow_up.svg")
+			} else {
+				pair.imgSrc = require("../assets/imgs/arrow_down.svg")
+			}
+		},
+	},
+	created: function () {
+		let self = this
+		this.connection = new WebSocket("wss://streamer.cryptocompare.com/v2?api_key=" + this.apiKey)
+		this.connection.onopen = function onStreamOpen() {
+			let subRequest = {
+				action: "SubAdd",
+				subs: [
+					"0~Coinbase~BTC~USD",
+					"0~Coinbase~BCH~USD",
+					"0~Coinbase~ETH~USD",
+					"0~Coinbase~XRP~USD",
+					"24~CCCAGG~BTC~USD~D",
+					"24~CCCAGG~BCH~USD~D",
+					"24~CCCAGG~ETH~USD~D",
+					"24~CCCAGG~XRP~USD~D",
+				],
+			}
+
+			this.timer = setInterval(() => self.sendMessage(subRequest), 1000)
+		}
+
+		this.connection.onmessage = function onStreamMessage(event) {
+			let message = JSON.parse(event.data)
+			let id = 0
+
+			if (message.TYPE == 0) {
+				switch (message.FSYM) {
+					case "BTC":
+						id = 0
+						break
+					case "BCH":
+						id = 1
+						break
+					case "ETH":
+						id = 2
+						break
+					case "XRP":
+						id = 3
+						break
+				}
+				self.currencyPairs[id].price = message.P
+			}
+			if (message.TYPE == 24) {
+				switch (message.FROMSYMBOL) {
+					case "BTC":
+						id = 0
+						break
+					case "BCH":
+						id = 1
+						break
+					case "ETH":
+						id = 2
+						break
+					case "XRP":
+						id = 3
+						break
+				}
+				self.currencyPairs[id].changedPercentPerDay = (
+					((message.OPEN - message.CLOSE) / ((message.OPEN + message.CLOSE) / 2)) *
+					100
+				).toFixed(2)
+				self.currencyPairsImgChanger(self.currencyPairs[id])
+			}
+		}
+	},
+	beforeDestroy: function () {
+		this.cancelAutoUpdate()
+	},
 }
 </script>
 
@@ -127,7 +239,7 @@ export default {
 					color: #ffffff;
 				}
 
-				tbody tr:hover {
+				.active {
 					background: linear-gradient(90deg, rgba(31, 70, 106, 0.88) 0%, #191a20 138.3%), #191a20;
 					border-radius: 0.5px;
 				}
