@@ -56,28 +56,28 @@ export default {
 					value: ["USD", "BTC"],
 					price: 0,
 					changedPercentPerDay: 0,
-					imgSrc: require("../assets/imgs/arrow_up.svg"),
+					imgSrc: "",
 				},
 				{
 					id: 1,
 					value: ["USD", "BCH"],
 					price: 0,
 					changedPercentPerDay: 0,
-					imgSrc: require("../assets/imgs/arrow_up.svg"),
+					imgSrc: "",
 				},
 				{
 					id: 2,
 					value: ["USD", "ETH"],
 					price: 0,
 					changedPercentPerDay: 0,
-					imgSrc: require("../assets/imgs/arrow_up.svg"),
+					imgSrc: "",
 				},
 				{
 					id: 3,
 					value: ["USD", "XRP"],
 					price: 0,
 					changedPercentPerDay: 0,
-					imgSrc: require("../assets/imgs/arrow_up.svg"),
+					imgSrc: "",
 				},
 			],
 		}
@@ -93,6 +93,8 @@ export default {
 		currencyPairsImgChanger: function (pair) {
 			if (pair.changedPercentPerDay > 0) {
 				pair.imgSrc = require("../assets/imgs/arrow_up.svg")
+			} else if (pair.changedPercentPerDay == 0) {
+				pair.imgSrc = ""
 			} else {
 				pair.imgSrc = require("../assets/imgs/arrow_down.svg")
 			}
