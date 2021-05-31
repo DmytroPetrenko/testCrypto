@@ -4,6 +4,9 @@
 			<img src="@/assets/imgs/LOGO.svg" alt="logo" />
 		</header>
 		<main>
+			<div class="headOfTableMob">
+				<h4>Панель котировок</h4>
+			</div>
 			<div class="tableContainer">
 				<div class="headOfTable">
 					<h1>Панель котировок</h1>
@@ -82,6 +85,9 @@ export default {
 		margin-top: 60px;
 		flex: 1;
 		display: flex;
+		.headOfTableMob {
+			display: none;
+		}
 		.tableContainer {
 			flex: 27;
 			background-color: #191a20;
@@ -134,13 +140,48 @@ export default {
 	}
 
 	@media screen and (max-width: 640px) {
+		header {
+			height: 30px;
+			img {
+				width: 64px;
+				height: 11px;
+			}
+		}
 		main {
 			flex-direction: column;
+			margin-top: 30px;
 			.tableContainer {
 				order: 2;
+				flex: 1;
+				padding: 13px 14px 0 15px;
+				.table table thead tr td h3 {
+					margin: 0;
+					font-weight: 400;
+					font-size: 12px;
+				}
 			}
 			.graphContainer {
 				order: 1;
+				flex: 1;
+			}
+			.headOfTableMob {
+				display: flex;
+				order: 0;
+				background-color: #191a20;
+				height: 25px;
+				h4 {
+					margin: 0;
+					font-family: "Montserrat";
+					font-style: normal;
+					font-weight: 600;
+					font-size: 14px;
+					line-height: 150%;
+					color: #ffffff;
+					padding: 2px 15px;
+				}
+			}
+			.headOfTable {
+				display: none;
 			}
 		}
 	}
