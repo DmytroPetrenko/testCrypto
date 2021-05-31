@@ -21,7 +21,12 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr v-for="pair in currencyPairs" :key="pair.id">
+							<tr
+								v-for="pair in currencyPairs"
+								:key="pair.id"
+								v-bind:class="{ active: pair.isActive }"
+								v-on:click="selectPair(pair)"
+							>
 								<td>
 									<h2>{{ pair.value[0] }} | {{ pair.value[1] }}</h2>
 								</td>
@@ -50,6 +55,7 @@ export default {
 			connection: null,
 			apiKey: "1fc9ac8cdde28a178bef9610e65668c7cb135e4da5ef3326f203b3cfdd963aae",
 			timer: "",
+			activePairId: 0,
 			currencyPairs: [
 				{
 					id: 0,
@@ -57,6 +63,7 @@ export default {
 					price: 0,
 					changedPercentPerDay: 0,
 					imgSrc: "",
+					isActive: false,
 				},
 				{
 					id: 1,
@@ -64,6 +71,7 @@ export default {
 					price: 0,
 					changedPercentPerDay: 0,
 					imgSrc: "",
+					isActive: false,
 				},
 				{
 					id: 2,
@@ -71,6 +79,7 @@ export default {
 					price: 0,
 					changedPercentPerDay: 0,
 					imgSrc: "",
+					isActive: false,
 				},
 				{
 					id: 3,
@@ -78,6 +87,7 @@ export default {
 					price: 0,
 					changedPercentPerDay: 0,
 					imgSrc: "",
+					isActive: false,
 				},
 			],
 		}
@@ -99,8 +109,13 @@ export default {
 				pair.imgSrc = require("../assets/imgs/arrow_down.svg")
 			}
 		},
+		selectPair: function (pair) {
+			this.currencyPairs[this.activePairId].isActive = false
+			this.activePairId = pair.id
+			pair.isActive = true
+		},
 	},
-	created: function () {
+	/* created: function () {
 		let self = this
 		this.connection = new WebSocket("wss://streamer.cryptocompare.com/v2?api_key=" + this.apiKey)
 		this.connection.onopen = function onStreamOpen() {
@@ -164,7 +179,7 @@ export default {
 				self.currencyPairsImgChanger(self.currencyPairs[id])
 			}
 		}
-	},
+	}, */
 	beforeDestroy: function () {
 		this.cancelAutoUpdate()
 	},
