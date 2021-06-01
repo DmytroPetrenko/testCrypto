@@ -41,12 +41,20 @@
 					</table>
 				</div>
 			</div>
-			<div class="graphContainer">grap</div>
+			<div class="graphContainer">
+				<div class="chartdiv" ref="chartdiv"></div>
+			</div>
 		</main>
 	</div>
 </template>
 
 <script>
+import * as am4core from "@amcharts/amcharts4/core"
+import * as am4charts from "@amcharts/amcharts4/charts"
+import am4themes_animated from "@amcharts/amcharts4/themes/animated"
+
+am4core.useTheme(am4themes_animated)
+
 export default {
 	name: "Dashboard",
 
@@ -56,6 +64,7 @@ export default {
 			apiKey: "1fc9ac8cdde28a178bef9610e65668c7cb135e4da5ef3326f203b3cfdd963aae",
 			timer: "",
 			activePairId: 0,
+			diagramData: null,
 			currencyPairs: [
 				{
 					id: 0,
@@ -113,10 +122,62 @@ export default {
 			this.currencyPairs[this.activePairId].isActive = false
 			this.activePairId = pair.id
 			pair.isActive = true
+			let self = this
+			fetch("https://min-api.cryptocompare.com/data/v2/histominute?fsym=BTC&tsym=USD&limit=10")
+				.then((response) => response.json())
+				.then((data) => {
+					self.diagramData = data.Data.Data
+					this.$nextTick(() => this.createDiagram())
+				})
+		},
+		createDiagram: function () {
+			let self = this
+
+			let chart = am4core.create(this.$refs.chartdiv, am4charts.XYChart)
+
+			chart.paddingRight = 20
+
+			let data = []
+			for (let i = 0; i < self.diagramData.length; i++) {
+				data.push({
+					date: new Date(self.diagramData[i].time * 1000),
+					name: "name",
+					value: self.diagramData[i].open,
+				})
+			}
+
+			chart.data = data
+
+			let dateAxis = chart.xAxes.push(new am4charts.DateAxis())
+			dateAxis.renderer.grid.template.location = 0
+
+			let valueAxis = chart.yAxes.push(new am4charts.ValueAxis())
+			valueAxis.tooltip.disabled = true
+			valueAxis.renderer.minWidth = 35
+
+			let series = chart.series.push(new am4charts.LineSeries())
+			series.dataFields.dateX = "date"
+			series.dataFields.valueY = "value"
+
+			series.tooltipText = "{valueY.value}"
+			chart.cursor = new am4charts.XYCursor()
+
+			let scrollbarX = new am4charts.XYChartScrollbar()
+			scrollbarX.series.push(series)
+			chart.scrollbarX = scrollbarX
+
+			this.chart = chart
 		},
 	},
-	/* created: function () {
+	created: function () {
 		let self = this
+		fetch("https://min-api.cryptocompare.com/data/v2/histominute?fsym=BTC&tsym=USD&limit=10")
+			.then((response) => response.json())
+			.then((data) => {
+				self.diagramData = data.Data.Data
+				this.$nextTick(() => this.createDiagram())
+			})
+
 		this.connection = new WebSocket("wss://streamer.cryptocompare.com/v2?api_key=" + this.apiKey)
 		this.connection.onopen = function onStreamOpen() {
 			let subRequest = {
@@ -179,9 +240,13 @@ export default {
 				self.currencyPairsImgChanger(self.currencyPairs[id])
 			}
 		}
-	}, */
+	},
+
 	beforeDestroy: function () {
 		this.cancelAutoUpdate()
+		if (this.chart) {
+			this.chart.dispose()
+		}
 	},
 }
 </script>
@@ -281,6 +346,10 @@ export default {
 		.graphContainer {
 			flex: 73;
 			background-color: #eeeeee;
+			.chartdiv {
+				width: 100%;
+				height: 500px;
+			}
 		}
 	}
 
