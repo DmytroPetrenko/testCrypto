@@ -31,7 +31,10 @@
 									<h2>{{ pair.value[0] }} | {{ pair.value[1] }}</h2>
 								</td>
 								<td>
-									<h2><img :src="pair.imgSrc" /> {{ Math.abs(pair.changedPercentPerDay) }}</h2>
+									<h2>
+										<img :src="pair.imgSrc" /> {{ Math.abs(pair.changedPercentPerDay) }}
+										<span v-if="pair.changedPercentPerDay != 0">%</span>
+									</h2>
 								</td>
 								<td>
 									<h2>{{ pair.price }}</h2>
@@ -68,6 +71,8 @@ export default {
 			timer: "",
 			activePairId: 0,
 			diagramData: null,
+			strRequest:
+				"https://min-api.cryptocompare.com/data/v2/histominute?fsym=BTC&tsym=USD&limit=10",
 			currencyPairs: [
 				{
 					id: 0,
@@ -75,7 +80,7 @@ export default {
 					price: 0,
 					changedPercentPerDay: 0,
 					imgSrc: "",
-					isActive: false,
+					isActive: true,
 				},
 				{
 					id: 1,
@@ -134,12 +139,14 @@ export default {
 			this.currencyPairs[this.activePairId].isActive = false
 			this.activePairId = pair.id
 			pair.isActive = true
-			let self = this
-			let strRequest = `https://min-api.cryptocompare.com/data/v2/histominute?fsym=${pair.value[1]}&tsym=USD&limit=10`
+			this.strRequest = `https://min-api.cryptocompare.com/data/v2/histominute?fsym=${pair.value[1]}&tsym=USD&limit=10`
+			this.getPairResponse(this.strRequest)
+		},
+		getPairResponse: function (strRequest) {
 			fetch(strRequest)
 				.then((response) => response.json())
 				.then((data) => {
-					self.diagramData = data.Data.Data
+					this.diagramData = data.Data.Data
 					this.$nextTick(() => this.createDiagram())
 				})
 		},
@@ -184,12 +191,8 @@ export default {
 	},
 	created: function () {
 		let self = this
-		fetch("https://min-api.cryptocompare.com/data/v2/histominute?fsym=BTC&tsym=USD&limit=10")
-			.then((response) => response.json())
-			.then((data) => {
-				self.diagramData = data.Data.Data
-				this.$nextTick(() => this.createDiagram())
-			})
+
+		this.getPairResponse(this.strRequest)
 
 		this.connection = new WebSocket("wss://streamer.cryptocompare.com/v2?api_key=" + this.apiKey)
 		this.connection.onopen = function onStreamOpen() {
@@ -253,6 +256,12 @@ export default {
 				self.currencyPairsImgChanger(self.currencyPairs[id])
 			}
 		}
+	},
+
+	mounted: function () {
+		window.setInterval(() => {
+			this.getPairResponse(this.strRequest)
+		}, 60000)
 	},
 
 	beforeDestroy: function () {
