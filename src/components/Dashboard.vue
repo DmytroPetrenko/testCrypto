@@ -31,7 +31,7 @@
 									<h2>{{ pair.value[0] }} | {{ pair.value[1] }}</h2>
 								</td>
 								<td>
-									<h2><img :src="pair.imgSrc" /> {{ pair.changedPercentPerDay }}</h2>
+									<h2><img :src="pair.imgSrc" /> {{ Math.abs(pair.changedPercentPerDay) }}</h2>
 								</td>
 								<td>
 									<h2>{{ pair.price }}</h2>
@@ -42,6 +42,9 @@
 				</div>
 			</div>
 			<div class="graphContainer">
+				<div class="graphHeader">
+					<h1>{{ selectedPair }}</h1>
+				</div>
 				<div class="chartdiv" ref="chartdiv"></div>
 			</div>
 		</main>
@@ -101,6 +104,15 @@ export default {
 			],
 		}
 	},
+	computed: {
+		selectedPair: function () {
+			return (
+				this.currencyPairs[this.activePairId].value[0] +
+				" | " +
+				this.currencyPairs[this.activePairId].value[1]
+			)
+		},
+	},
 	methods: {
 		sendMessage: function (subRequest) {
 			let self = this
@@ -123,7 +135,8 @@ export default {
 			this.activePairId = pair.id
 			pair.isActive = true
 			let self = this
-			fetch("https://min-api.cryptocompare.com/data/v2/histominute?fsym=BTC&tsym=USD&limit=10")
+			let strRequest = `https://min-api.cryptocompare.com/data/v2/histominute?fsym=${pair.value[1]}&tsym=USD&limit=10`
+			fetch(strRequest)
 				.then((response) => response.json())
 				.then((data) => {
 					self.diagramData = data.Data.Data
@@ -346,6 +359,17 @@ export default {
 		.graphContainer {
 			flex: 73;
 			background-color: #eeeeee;
+			.graphHeader h1 {
+				font-family: "Montserrat";
+				font-style: normal;
+				font-weight: 600;
+				font-size: 24px;
+				line-height: 150%;
+				text-transform: uppercase;
+				color: #191a20;
+				text-align: center;
+				margin: 31px 0 0 0;
+			}
 			.chartdiv {
 				width: 100%;
 				height: 500px;
@@ -395,6 +419,9 @@ export default {
 			.graphContainer {
 				order: 1;
 				flex: 1;
+				.graphHeader h1 {
+					font-size: 14px;
+				}
 			}
 			.headOfTableMob {
 				display: flex;
